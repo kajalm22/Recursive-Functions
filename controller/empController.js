@@ -64,4 +64,15 @@ const addDetails = ( async (req , res) => {
 })
 
 
-module.exports = { addDetails }
+
+const getEmployees = async (req, res) => {
+    try {
+      const result = await Employees.find();
+      res.status(200).json(result);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  }
+
+
+module.exports = { addDetails , getEmployees}
