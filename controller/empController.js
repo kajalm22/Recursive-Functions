@@ -10,7 +10,7 @@ const addDetails = ( async (req , res) => {
         let col = db.collection("Employees")
         let bulk = col.initializeOrderedBulkOp()
 
-        for(i = 0 ; i< 5000; ++i){
+        for(i = 0 ; i< 5000 ; i++){
         Employees.bulkWrite([
             {
                 insertOne: {
@@ -56,11 +56,12 @@ const addDetails = ( async (req , res) => {
         ])
     }
         res.status(201).json("Details added successfully")
+        console.log(addDetails)
         
     } catch (error) {
         res.status(500).json("Something went wrong")
     }
-    db.close()
+    // db.close()
 })
 
 
@@ -74,5 +75,5 @@ const getEmployees = async (req, res) => {
     }
   }
 
-
-module.exports = { addDetails , getEmployees}
+ 
+module.exports = { addDetails , getEmployees }
