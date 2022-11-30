@@ -7,8 +7,6 @@ const Employees = require("../models/empModel")
 const addDetails = ( async (req , res) => {
 
     try {
-        let col = db.collection("Employees")
-        let bulk = col.initializeOrderedBulkOp()
 
         for(i = 0 ; i< 5000 ; i++){
         Employees.bulkWrite([
@@ -56,7 +54,7 @@ const addDetails = ( async (req , res) => {
         ])
     }
         res.status(201).json("Details added successfully")
-        console.log(addDetails)
+        // console.log(addDetails)
         
     } catch (error) {
         res.status(500).json("Something went wrong")
@@ -66,14 +64,5 @@ const addDetails = ( async (req , res) => {
 
 
 
-const getEmployees = async (req, res) => {
-    try {
-      const result = await Employees.find();
-      res.status(200).json(result);
-    } catch (err) {
-      res.status(500).json(err);
-    }
-  }
-
  
-module.exports = { addDetails , getEmployees }
+module.exports = { addDetails }
