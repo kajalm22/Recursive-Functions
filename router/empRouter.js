@@ -1,13 +1,12 @@
 const express = require("express")
-const { addDetails } = require("../controller/empController")
+const { addDetails,  empDetails } = require("../controller/empController")
 const router = express.Router()
 
 
 router.route("/create").post(addDetails)
 
-// router.route("/add").post(details)
 
-// router.route("/get").get(getEmployees)
+router.route("/save").get(empDetails)
 
 
 

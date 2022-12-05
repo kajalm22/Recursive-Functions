@@ -1,11 +1,11 @@
 const express = require("express")
 const mongoose = require("mongoose")
-const { db } = require("../models/empModel")
+const { db, insertMany } = require("../models/empModel")
 const Employees = require("../models/empModel")
+const chunk = require("chunk")
 
 
 const addDetails = ( async (req , res) => {
-
     try {
 
         for(i = 0 ; i< 5000 ; i++){
@@ -63,6 +63,49 @@ const addDetails = ( async (req , res) => {
 })
 
 
+const empDetails = ( async (req , res) => {
+    try {
+        const details = await Employees.find()
+
+        chunkedData = chunk(details , 1000)
+        const chunkDataLength = chunkDataLength.length
+
+        async function insertData (chunkedData , i){ 
+        
+        if(chunkDataLength != i){
+            const myFunction = (Employees) => {
+                data = {
+                    name: Employees.name,
+                    email: Employees.email,
+                    contact: Employees.contact,
+                    department: Employees.department
+                }
+                
+                return { insertOne:
+                     { document: details } 
+                    }
+                    
+            }
+            const arr = chunkedData[i]
+            const resArray = arr.map(myFunction)
+            const result = await empDetails.bulkWrite(resArray)
+
+            insertData(chunkedData, i++)
+            
+        }else{
+            res.status(200).json("Sending data...")
+        }}
+    
+    
+    // insertData ( chunkedData , 0)
+    }catch (error) {
+        // console.log("Error")
+        res.status(500).json(error)
+    }
+   
+})
+
+
 
  
-module.exports = { addDetails }
+module.exports = { addDetails , empDetails }
