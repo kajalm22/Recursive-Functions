@@ -88,9 +88,11 @@ const empDetails = ( async (req , res) => {
             }
             const arr = chunkedData[i]
             const resArray = arr.map(myFunction)
-            const result = await empDetails.bulkWrite(resArray)
+            const result = await User.bulkWrite(resArray)
 
             insertData(chunkedData, i++)
+            
+            res.status(201).json(details)
             
         }else{
             res.status(200).json("Sending data...")
