@@ -91,7 +91,7 @@ const empDetails = ( async (req , res) => {
             const result = await User.bulkWrite(resArray)
 
             insertData(chunkedData, i++)
-            
+            // console.log("data added")
             res.status(201).json(details)
             
         }else{
