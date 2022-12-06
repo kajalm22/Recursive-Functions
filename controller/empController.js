@@ -1,7 +1,7 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const { db, insertMany } = require("../models/empModel")
-const employees = require("../models/empModel")
+const students = require("../models/empModel")
 const chunk = require("chunk")
 
 
@@ -9,7 +9,7 @@ const addDetails = ( async (req , res) => {
     try {
 
         for(i = 0 ; i< 5000 ; i++){
-        employees.bulkWrite([
+        students.bulkWrite([
             {
                 insertOne: {
                     document: {
@@ -65,20 +65,20 @@ const addDetails = ( async (req , res) => {
 
 const empDetails = ( async (req , res) => {
     try {
-        const details = await employees.find()
-
+        const details = await students.find()
+        // console.log("details")
         chunkedData = chunk(details , 1000)
         const chunkDataLength = chunkDataLength.length
 
         async function insertData (chunkedData , i){ 
         
         if(chunkDataLength != i){
-            const empFunction = (employees) => {
+            const studentFunction = (students) => {
                 data = {
-                    name: employees.name,
-                    email: employees.email,
-                    contact: employees.contact,
-                    department: employees.department
+                    name: students.name,
+                    email: students.email,
+                    contact: students.contact,
+                    department: students.department
                 }
                 
                 return { insertOne:
@@ -86,8 +86,9 @@ const empDetails = ( async (req , res) => {
                     }
                     
             }
+            
             const arr = chunkedData[i]
-            const resArray = arr.map(empFunction)
+            const resArray = arr.map(studentFunction)
             const result = await user.bulkWrite(resArray)
 
             insertData(chunkedData, i++)
@@ -107,7 +108,7 @@ const empDetails = ( async (req , res) => {
     // async function getUserData(){
 
     // const data = await user.find() 
-    //     if( length != 0){
+    //     if( data.length != 0){
     // res.status(200).json(data)
     //     }else{
     //         res.status(500).json("Error")
