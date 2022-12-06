@@ -110,9 +110,6 @@ const studentDetails = ( async (req , res) => {
 
 
 
-
-
-
     // async function getUserData(){
 
     // const data = await user.find() 
