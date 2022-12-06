@@ -138,6 +138,18 @@ if(data != 0){
 }
 }
 
+async function userInfo (){
+    let object = {
+        name: users.name,
+        email: users.email,
+        contact: users.contact,
+        department: users.department
+    }
+    
+    return { insertOne:
+         { document: object } 
+        }
+}
 const pages = (async ( req , res) => {
     try {
         async function fetch(newPage , newLimit){
@@ -146,7 +158,7 @@ const pages = (async ( req , res) => {
 
             const data = await showData(page , limit)
             if(pagination == true){
-                const arr = pagination.map.studentInfo
+                const arr = pagination.map.userInfo
 
             }
 
