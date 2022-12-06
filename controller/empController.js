@@ -99,13 +99,19 @@ const studentDetails = ( async (req , res) => {
             res.status(201).json({message : "Data added in User collection" })
             
         }else{
-            res.status(200).json("Error sending data")
+            res.status(500).json("Error sending data")
         }}
-    insertData (chunkedData , 0)
+
+
     }catch (error) {
         // console.log("Error")
         res.status(500).json(error)
     }
+
+
+
+
+
 
     // async function getUserData(){
 
