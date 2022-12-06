@@ -73,7 +73,7 @@ const empDetails = ( async (req , res) => {
         async function insertData (chunkedData , i){ 
         
         if(chunkDataLength != i){
-            const myFunction = (employees) => {
+            const empFunction = (employees) => {
                 data = {
                     name: employees.name,
                     email: employees.email,
@@ -87,13 +87,13 @@ const empDetails = ( async (req , res) => {
                     
             }
             const arr = chunkedData[i]
-            const resArray = arr.map(myFunction)
+            const resArray = arr.map(empFunction)
             const result = await user.bulkWrite(resArray)
 
             insertData(chunkedData, i++)
 
             // console.log("data added")
-            res.status(201).json({message :"Data added in User collection" })
+            res.status(201).json({message : "Data added in User collection" })
             
         }else{
             res.status(200).json("Error sending data")
@@ -104,15 +104,15 @@ const empDetails = ( async (req , res) => {
         res.status(500).json(error)
     }
 
-    async function getUserData(){
+    // async function getUserData(){
 
-    const data = user.find() 
-        if( data.length != 0){
-    res.status(200).json(data)
-        }else{
-            res.status(500).json("Error")
-        }
-    }
+    // const data = await user.find() 
+    //     if( length != 0){
+    // res.status(200).json(data)
+    //     }else{
+    //         res.status(500).json("Error")
+    //     }
+    // }
 })
 
 
