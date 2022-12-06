@@ -1,7 +1,7 @@
 const express = require("express")
 const mongoose = require("mongoose")
-const { db, insertMany } = require("../models/empModel")
-const students = require("../models/empModel")
+const { db, insertMany } = require("../models/studentModel")
+const students = require("../models/studentModel")
 const chunk = require("chunk")
 
 
@@ -63,12 +63,14 @@ const addDetails = ( async (req , res) => {
 })
 
 
-const empDetails = ( async (req , res) => {
+const studentDetails = ( async (req , res) => {
     try {
         const details = await students.find()
         // console.log("details")
+
         chunkedData = chunk(details , 1000)
         const chunkDataLength = chunkDataLength.length
+        // console.log(chunkDataLength)
 
         async function insertData (chunkedData , i){ 
         
@@ -82,7 +84,7 @@ const empDetails = ( async (req , res) => {
                 }
                 
                 return { insertOne:
-                     { document: details } 
+                     { document: data } 
                     }
                     
             }
@@ -99,7 +101,7 @@ const empDetails = ( async (req , res) => {
         }else{
             res.status(200).json("Error sending data")
         }}
-    
+    insertData (chunkedData , 0)
     }catch (error) {
         // console.log("Error")
         res.status(500).json(error)
@@ -119,4 +121,4 @@ const empDetails = ( async (req , res) => {
 
 
  
-module.exports = { addDetails , empDetails }
+module.exports = { addDetails , studentDetails }

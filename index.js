@@ -13,7 +13,7 @@ connectDB()
 app.use(express.json())
 app.use(express.urlencoded({ extended : false }))
 
-app.use("/students" , require("./router/empRouter"))
+app.use("/students" , require("./router/studentRouter"))
 
 
 app.listen(port , () => console.log(`Server connected on ${port}`))
