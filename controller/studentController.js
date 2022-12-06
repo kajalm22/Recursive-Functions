@@ -64,17 +64,17 @@ const addDetails = ( async (req , res) => {
 })
 
 
-//saving data from one collection students into other collection users
+//saving data from one collection students into another collection users
 const studentDetails = ( async (req , res) => {
     // console.log("enter")
     try {
         const details = await students.find()
 
-        chunkedData = chunk(details , 1000)
-        const chunkDataLength = chunkedData.length
+        chunkedData = chunk(details , 1000)            // 20 sets of data containing 1000 docs each 
+        const chunkDataLength = chunkedData.length     //chunk data length is 20
 
         async function insertData (chunkedData , i){ 
-        if(chunkDataLength> i){
+        if(chunkDataLength> i){  
             const studentFunction = (students) => {
                 var obj = {
                     name: students.name,
@@ -92,13 +92,14 @@ const studentDetails = ( async (req , res) => {
             const arr = chunkedData[i]
             const resArray = arr.map(studentFunction)
             const result = await users.bulkWrite(resArray)
+
             i=i+1
             insertData(chunkedData, i)
         }else{
-            res.status(200).json("Data added in Users collection")
+            res.status(200).json({ message: "Data added in Users collection"})
         }}
         
-        insertData(chunkedData,0)
+        insertData(chunkedData,0) //i starts loop from 0 
     }catch (error) {
         // console.log("Error")
         res.status(500).json(error)
@@ -106,20 +107,54 @@ const studentDetails = ( async (req , res) => {
 
 })
 
+// pagination on array of objects 
 
 const paginatedData = ( async ( req , res) => {
-    const page = req.query.page  || 1
-    const perPage = 5
-
     try {
+        async function getData( ){
+            const data = await studentData()
         
-        let data = await users.find().skip((page - 1) * perPage).limit(perPage)
-res.status(200).json(data)
+        if(pagination == true){
+            const arr = pagination.map.addDetails()
+            const result = await users.bulkWrite(arr)
+        }else{
+            res.status(500).json(error)
+        }
+    }
+    getData()
 
     } catch (error) {
         res.status(500).json(error)
     }
 })
 
+async function showData (page , limit){
+const data = await users.find().skip((page - 1) * perPage).limit(perPage)
+if(data != 0){
+    return data
+
+}else{
+    console.log("Error")
+}
+}
+
+const pages = (async ( req , res) => {
+    try {
+        async function fetch(newPage , newLimit){
+            let page = newPage
+            let limit = newLimit
+
+            const data = await showData(page , limit)
+            if(pagination == true){
+                const arr = pagination.map.studentInfo
+
+            }
+
+        }
+        
+    } catch (error) {
+        
+    }
+})
  
-module.exports = { addDetails , studentDetails , paginatedData}
+module.exports = { addDetails , studentDetails , paginatedData , pages}
