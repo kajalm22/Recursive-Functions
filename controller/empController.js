@@ -1,7 +1,7 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const { db, insertMany } = require("../models/empModel")
-const Employees = require("../models/empModel")
+const employees = require("../models/empModel")
 const chunk = require("chunk")
 
 
@@ -9,7 +9,7 @@ const addDetails = ( async (req , res) => {
     try {
 
         for(i = 0 ; i< 5000 ; i++){
-        Employees.bulkWrite([
+        employees.bulkWrite([
             {
                 insertOne: {
                     document: {
@@ -65,7 +65,7 @@ const addDetails = ( async (req , res) => {
 
 const empDetails = ( async (req , res) => {
     try {
-        const details = await Employees.find()
+        const details = await employees.find()
 
         chunkedData = chunk(details , 1000)
         const chunkDataLength = chunkDataLength.length
@@ -73,12 +73,12 @@ const empDetails = ( async (req , res) => {
         async function insertData (chunkedData , i){ 
         
         if(chunkDataLength != i){
-            const myFunction = (Employees) => {
+            const myFunction = (employees) => {
                 data = {
-                    name: Employees.name,
-                    email: Employees.email,
-                    contact: Employees.contact,
-                    department: Employees.department
+                    name: employees.name,
+                    email: employees.email,
+                    contact: employees.contact,
+                    department: employees.department
                 }
                 
                 return { insertOne:
@@ -88,23 +88,31 @@ const empDetails = ( async (req , res) => {
             }
             const arr = chunkedData[i]
             const resArray = arr.map(myFunction)
-            const result = await User.bulkWrite(resArray)
+            const result = await user.bulkWrite(resArray)
 
             insertData(chunkedData, i++)
+
             // console.log("data added")
-            res.status(201).json(details)
+            res.status(201).json({message :"Data added in User collection" })
             
         }else{
-            res.status(200).json("Sending data...")
+            res.status(200).json("Error sending data")
         }}
     
-    
-    // insertData ( chunkedData , 0)
     }catch (error) {
         // console.log("Error")
         res.status(500).json(error)
     }
-   
+
+    async function getUserData(){
+
+    const data = user.find() 
+        if( data.length != 0){
+    res.status(200).json(data)
+        }else{
+            res.status(500).json("Error")
+        }
+    }
 })
 
 

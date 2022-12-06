@@ -26,4 +26,4 @@ const empSchema = new mongoose.Schema(
 )
 
 
-module.exports = mongoose.model("Employees" , empSchema)
+module.exports = mongoose.model("employees" , empSchema)
