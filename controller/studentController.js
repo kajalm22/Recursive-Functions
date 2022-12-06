@@ -2,6 +2,7 @@ const express = require("express")
 const mongoose = require("mongoose")
 const { db, insertMany } = require("../models/studentModel")
 const students = require("../models/studentModel")
+const users = require("../models/userModel")
 const chunk = require("chunk")
 
 
@@ -63,20 +64,19 @@ const addDetails = ( async (req , res) => {
 })
 
 
+//saving data from one collection students into other collection users
 const studentDetails = ( async (req , res) => {
+    // console.log("enter")
     try {
         const details = await students.find()
-        // console.log("details")
 
         chunkedData = chunk(details , 1000)
-        const chunkDataLength = chunkDataLength.length
-        // console.log(chunkDataLength)
+        const chunkDataLength = chunkedData.length
 
         async function insertData (chunkedData , i){ 
-        
-        if(chunkDataLength != i){
+        if(chunkDataLength> i){
             const studentFunction = (students) => {
-                data = {
+                var obj = {
                     name: students.name,
                     email: students.email,
                     contact: students.contact,
@@ -84,44 +84,42 @@ const studentDetails = ( async (req , res) => {
                 }
                 
                 return { insertOne:
-                     { document: data } 
+                     { document: obj } 
                     }
                     
             }
             
             const arr = chunkedData[i]
             const resArray = arr.map(studentFunction)
-            const result = await user.bulkWrite(resArray)
-
-            insertData(chunkedData, i++)
-
-            // console.log("data added")
-            res.status(201).json({message : "Data added in User collection" })
-            
+            const result = await users.bulkWrite(resArray)
+            i=i+1
+            insertData(chunkedData, i)
         }else{
-            res.status(500).json("Error sending data")
+            res.status(200).json("Data added in Users collection")
         }}
-
-
+        
+        insertData(chunkedData,0)
     }catch (error) {
         // console.log("Error")
         res.status(500).json(error)
     }
 
-
-
-    // async function getUserData(){
-
-    // const data = await user.find() 
-    //     if( data.length != 0){
-    // res.status(200).json(data)
-    //     }else{
-    //         res.status(500).json("Error")
-    //     }
-    // }
 })
 
 
+const paginatedData = ( async ( req , res) => {
+    const page = req.query.page  || 1
+    const perPage = 5
+
+    try {
+        
+        let data = await users.find().skip((page - 1) * perPage).limit(perPage)
+res.status(200).json(data)
+
+    } catch (error) {
+        res.status(500).json(error)
+    }
+})
 
  
-module.exports = { addDetails , studentDetails }
+module.exports = { addDetails , studentDetails , paginatedData}
