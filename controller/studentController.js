@@ -3,6 +3,7 @@ const mongoose = require("mongoose")
 const { db, insertMany } = require("../models/studentModel")
 const students = require("../models/studentModel")
 const users = require("../models/userModel")
+const newUsers = require("../models/newUser")
 const chunk = require("chunk")
 
 
@@ -71,7 +72,7 @@ const studentDetails = ( async (req , res) => {
         const details = await students.find()
 
         chunkedData = chunk(details , 1000)            // 20 sets of data containing 1000 docs each 
-        const chunkDataLength = chunkedData.length     //chunk data length is 20
+        const chunkDataLength = chunkedData.length     //chunk data length 20
 
         async function insertData (chunkedData , i){ 
         if(chunkDataLength> i){  
@@ -85,8 +86,7 @@ const studentDetails = ( async (req , res) => {
                 
                 return { insertOne:
                      { document: obj } 
-                    }
-                    
+                    }  
             }
             
             const arr = chunkedData[i]
@@ -107,39 +107,33 @@ const studentDetails = ( async (req , res) => {
 
 })
 
-// pagination on array of objects 
+// pagination on (chunk data)array of objects 
 
 const paginatedData = ( async ( req , res) => {
-    try {
-        async function getData( ){
-            const data = await studentData()
         
+    try {
+        chunkData = chunk(details , 1000)
+        async function getData(){
+            const pagination = userInfo()
+            // console.log(pagination)
         if(pagination == true){
             const arr = pagination.map.addDetails()
-            const result = await users.bulkWrite(arr)
+            const result = await newUsers.bulkWrite(arr)
+            res.status(200).json(result)
         }else{
-            res.status(500).json(error)
+            res.status(500).json("error in first function")
         }
     }
     getData()
 
     } catch (error) {
+        console.log("error found")
         res.status(500).json(error)
     }
 })
 
-async function showData (page , limit){
-const data = await users.find().skip((page - 1) * perPage).limit(perPage)
-if(data != 0){
-    return data
-
-}else{
-    console.log("Error")
-}
-}
-
-async function userInfo (){
-    let object = {
+ function userInfo (){
+    var object = {
         name: users.name,
         email: users.email,
         contact: users.contact,
@@ -149,24 +143,18 @@ async function userInfo (){
     return { insertOne:
          { document: object } 
         }
-}
-const pages = (async ( req , res) => {
-    try {
-        async function fetch(newPage , newLimit){
-            let page = newPage
-            let limit = newLimit
-
-            const data = await showData(page , limit)
-            if(pagination == true){
-                const arr = pagination.map.userInfo
-
-            }
-
-        }
-        
-    } catch (error) {
-        
     }
-})
+
+async function showData (page , limit){
+const data = await newUsers.find().skip((page - 1) * limit).limit(limit)
+if(data.length != 0){
+    return data 
+
+}else{
+    console.log("Error")
+}
+}
+
+
  
-module.exports = { addDetails , studentDetails , paginatedData , pages}
+module.exports = { addDetails , studentDetails , paginatedData }
