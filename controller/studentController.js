@@ -1,6 +1,6 @@
 const express = require("express")
 const mongoose = require("mongoose")
-const { db, insertMany } = require("../models/studentModel")
+const { db, insertMany, collection } = require("../models/studentModel")
 const students = require("../models/studentModel")
 const users = require("../models/userModel")
 const newUsers = require("../models/newUser")
@@ -93,7 +93,7 @@ const studentDetails = ( async (req , res) => {
             const resArray = arr.map(studentFunction)
             const result = await users.bulkWrite(resArray)
 
-            i=i+1
+            i= i + 1
             insertData(chunkedData, i)
         }else{
             res.status(200).json({ message: "Data added in Users collection"})
@@ -109,30 +109,8 @@ const studentDetails = ( async (req , res) => {
 
 // pagination on (chunk data)array of objects 
 
-const paginatedData = ( async ( req , res) => {
-        
-    try {
-        chunkData = chunk(details , 1000)
-        async function getData(){
-            const pagination = userInfo()
-            // console.log(pagination)
-        if(pagination == true){
-            const arr = pagination.map.addDetails()
-            const result = await newUsers.bulkWrite(arr)
-            res.status(200).json(result)
-        }else{
-            res.status(500).json("error in first function")
-        }
-    }
-    getData()
 
-    } catch (error) {
-        console.log("error found")
-        res.status(500).json(error)
-    }
-})
-
- function userInfo (){
+const userInfo = (users) => {
     var object = {
         name: users.name,
         email: users.email,
@@ -145,16 +123,117 @@ const paginatedData = ( async ( req , res) => {
         }
     }
 
-async function showData (page , limit){
-const data = await newUsers.find().skip((page - 1) * limit).limit(limit)
-if(data.length != 0){
-    return data 
 
-}else{
-    console.log("Error")
+// chunk 10k into 1000 sets each
+// these 20 sets of 1000 data each should be first paginated then saved in another collection
+// set 1 paginated then saved in collection
+// set 2 paginated then saved in collection
+    
+const paginatedData = ( async ( req , res) => {
+      
+    try {
+        chunkData = chunk(details , 1000)
+        
+        async function getData( chunkData , i){
+            const pagination = await userInfo()
+            // console.log(pagination)
+        if(pagination == true){
+            const arr = chunkData[i]
+            const newArr = pagination.arr.map(userInfo)
+            const result = await newUsers.bulkWrite(newArr)
+            res.status(200).json(result)
+        }else{
+            res.status(500).json("data saved")
+        }
+    }
+    getData( chunkData , 0)
+
+    } catch (error) {
+        console.log("error found")
+        res.status(500).json(error)
+    }
+})
+
+
+// async function showData (page , limit){
+// const data = await newUsers.find().skip((page - 1) * limit).limit(limit)
+// // if(data.length != 0){
+// //     return data 
+
+// // }else{
+// //     console.log("Error")
+// // }
+// }
+
+// const showData = (async (req, res) => {
+//     const page = req.query.page || 1
+//     const perPage = 5
+//     const data = await newUsers.find()
+//       .skip((page - 1) * perPage)
+//       .limit(perPage)
+//     res.status(200).json(data)
+//   })
+
+const pages = (async ( req , res) => {
+    console.log("function start")
+    try {
+        async function fetch(newPage , newLimit){
+            // let page = newPage
+            // let limit = newLimit
+        // console.log("second")
+            const data = await showData(page , limit)
+            if(data == true){
+               
+                const arr = data.map(userInfo)
+                const result = await newUsers.bulkWrite(arr)
+                const details = await newUsers.find().skip((page - 1) * limit).limit(limit)
+                // console.log("details")
+                fetch (page++ , limit)
+                console.log("saving")
+                // res.status(201).json("Created")
+
+            }else{
+                res.status(200).json("Data saved")
+            }
+            fetch (1 , 5)
+        }
+    } catch (error) {
+        console.log("Function failed")
+        res.status(500).json(error)
+    }
+
+})
+module.exports = { addDetails , studentDetails , paginatedData , pages
+    // , showData
 }
-}
 
 
- 
-module.exports = { addDetails , studentDetails , paginatedData }
+
+// const pages = (async ( req , res) => {
+//     console.log("fucntion start")
+//     try {
+//         // async function fetch(page , limit){
+//         //     // let page = newPage
+//         //     // let limit = newLimit
+//         // console.log("second")
+//             const data = await showData(page , limit)
+//             if(pagination == true){
+//                 const arr = pagination.map(userInfo)
+//                 const result = await newUsers.bulkWrite(arr)
+//                 const data = await newUsers.find().skip((page - 1) * limit).limit(limit)
+//                 showData (page++ , limit)
+//                 console.log("saving")
+//                 res.status(201).json("Created")
+
+//             }else{
+//                 res.status(200).json("Data saved")
+//             }
+//             pages (1 , 5)
+
+        
+        
+//     } catch (error) {
+//         console.log("Function failed")
+//         res.status(500).json(error)
+//     }
+// })
