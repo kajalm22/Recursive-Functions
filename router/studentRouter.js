@@ -1,5 +1,5 @@
 const express = require("express")
-const { addDetails,  studentDetails, paginatedData 
+const { addDetails,  studentDetails, paginatedData, saveUsingPagination 
  } = require("../controller/studentController")
 const router = express.Router()
 
@@ -12,9 +12,10 @@ router.route("/save").get(studentDetails)
 
 router.route("/getPaginatedData").get(paginatedData)
 
-// router.route("/pages").get(showData)
 
 // router.route("/get").get(pages)
+
+router.route("/pagination").get(saveUsingPagination)
 
 
 module.exports = router
