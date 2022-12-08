@@ -108,6 +108,10 @@ const studentDetails = ( async (req , res) => {
 })
 
 
+// pagination on (chunk data)array of objects 
+// chunk 10k into 1000 sets each
+// these 20 sets of 1000 data each should be first paginated then saved in another collection
+// set 1 paginated then saved in collection
 
 const userInfo = (users) => {
     var object = {
@@ -126,26 +130,27 @@ const userInfo = (users) => {
 const paginatedData =( async ( req , res) => {
     console.log("function started")
     try {
-        const details = await users.find()
+        const details = await users.find().limit(1000)
         const data = chunk (details , 100)
         // const chunkDataLength = data.length
 
-        async function saveData ( i , res , data){
+         function saveData ( i , res , data){
         if(i == data.length){
-            return "data saved."
+            // return "data saved."
+            res.status(200).json({msg: "Saved"})
         
         }else{
             let array = data[i]
             function savePaginatedData  (j , start , end , limit , array){
-                let info = array.length / limit    // limit
+                let info = array.length     // limit
 
                 if(j != info){
                     let arrayData = array.slice(start , end)
-                    // console.log(arrayData)
+                    console.log(arrayData.length)
 
-                    const newArray = array.map(userInfo)
+                    const newArray = arrayData.map(userInfo)
                     const result = newUsers.bulkWrite(newArray)
-                    console.log(result)
+                    console.log("RESULTTT",result)
 
                     start = start + limit
                     end = end + limit
@@ -153,8 +158,9 @@ const paginatedData =( async ( req , res) => {
                     // j= j + 1
                     savePaginatedData(j + 1, start , end , limit , array )
                 }else{
-                   
-                    return false
+                    saveData(i + 1 , res , data)
+                //    res.status(200).json({msg: "Saved"})
+                    // return "Error found"
                 }
             }
 
@@ -162,7 +168,6 @@ const paginatedData =( async ( req , res) => {
             savePaginatedData( 0 , 0 , limit , limit , array)
 
             // i = i + 1
-            saveData(i + 1 , res , data)
         }
         }
        saveData(0 , res , data) 
@@ -173,23 +178,24 @@ const paginatedData =( async ( req , res) => {
 })
 
 
-// pagination on (chunk data)array of objects 
-// chunk 10k into 1000 sets each
-// these 20 sets of 1000 data each should be first paginated then saved in another collection
-// set 1 paginated then saved in collection
 
 
 const pages = async (page , limit) => {
+   
     const data = await newUsers.find().skip((page - 1) * limit).limit(limit)
     if(data.length == 0){
         return {
-            status: false,
-            // data: data
+            next: false,
+            data: data,
+            page: page,
+            limit: limit
         }
     }else{
         return {
-            status: true,
-            data: data
+            next: true,
+            data: data,
+            page: page,
+            limit: limit
         }
     }
 }
@@ -197,11 +203,12 @@ const pages = async (page , limit) => {
 
 const saveUsingPagination = (async ( req , res) => {
     try {
-        const saveData = async (page , limit) => {
-            const pageData = await pages (page , limit)
 
-            if(pageData.status) {
-                const newArray = pageData.data.map(userInfo)
+        function saveData  (page , limit)  {
+            const pageData =  pages (page , limit)
+// console.log("second")
+            if(pageData.next) {
+                const newArray = pageData.map(userInfo)
                 const result = newUsers.bulkWrite(newArray)
                 console.log(result)
 
