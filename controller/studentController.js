@@ -113,18 +113,18 @@ const studentDetails = ( async (req , res) => {
 // these 20 sets of 1000 data each should be first paginated then saved in another collection
 // set 1 paginated then saved in collection
 
-// const userInfo = (users) => {
-//     var object = {
-//        name: users.name,
-//        email: users.email,
-//        contact: users.contact,
-//        department: users.department
-//     }
+const userInfo = (users) => {
+    var object = {
+       name: users.name,
+       email: users.email,
+       contact: users.contact,
+       department: users.department
+    }
     
-//     return { insertOne:
-//          { document: object } 
-//         }
-//     }
+    return { insertOne:
+         { document: object } 
+        }
+    }
 
 
 const paginatedData =( async ( req , res) => {
@@ -178,21 +178,10 @@ const paginatedData =( async ( req , res) => {
 })
 
 
-const userInfo = (users) => {
-    var object = {
-       name: users.name,
-       email: users.email,
-       contact: users.contact,
-       department: users.department
-    }
-    
-    return { insertOne:
-         { document: object } 
-        }
-    }
+
 
     //paginate data and save in another collection
-    
+
 const pages = async (page , limit) => {
    
     const data = await users.find().skip((page - 1) * limit).limit(limit)
