@@ -113,18 +113,18 @@ const studentDetails = ( async (req , res) => {
 // these 20 sets of 1000 data each should be first paginated then saved in another collection
 // set 1 paginated then saved in collection
 
-const userInfo = (users) => {
-    var object = {
-       name: users.name,
-       email: users.email,
-       contact: users.contact,
-       department: users.department
-    }
+// const userInfo = (users) => {
+//     var object = {
+//        name: users.name,
+//        email: users.email,
+//        contact: users.contact,
+//        department: users.department
+//     }
     
-    return { insertOne:
-         { document: object } 
-        }
-    }
+//     return { insertOne:
+//          { document: object } 
+//         }
+//     }
 
 
 const paginatedData =( async ( req , res) => {
@@ -178,24 +178,39 @@ const paginatedData =( async ( req , res) => {
 })
 
 
+const userInfo = (users) => {
+    var object = {
+       name: users.name,
+       email: users.email,
+       contact: users.contact,
+       department: users.department
+    }
+    
+    return { insertOne:
+         { document: object } 
+        }
+    }
 
-
+    //paginate data and save in another collection
+    
 const pages = async (page , limit) => {
    
-    const data = await newUsers.find().skip((page - 1) * limit).limit(limit)
+    const data = await users.find().skip((page - 1) * limit).limit(limit)
     if(data.length == 0){
         return {
-            next: false,
-            data: data,
+            status: false,
+            
             page: page,
-            limit: limit
+            limit: limit,
+            data : data
         }
     }else{
         return {
-            next: true,
-            data: data,
+            status: true,
+            
             page: page,
-            limit: limit
+            limit: limit,
+            data: data
         }
     }
 }
@@ -204,18 +219,19 @@ const pages = async (page , limit) => {
 const saveUsingPagination = (async ( req , res) => {
     try {
 
-        function saveData  (page , limit)  {
-            const pageData =  pages (page , limit)
-// console.log("second")
-            if(pageData.next) {
-                const newArray = pageData.map(userInfo)
+        const saveData = async(page , limit) =>  {
+            const pageData =  await pages (page , limit)
+            console.log(pageData)
+            if(pageData.status)  {
+                
+                const newArray =  pageData.data.map(userInfo)
                 const result = newUsers.bulkWrite(newArray)
-                console.log(result)
+                console.log("RESULT" , result)
 
                 // page = page + 1
                 saveData (pageData.page + 1  , pageData.limit)
             }else{
-                res.status(200).json({message : "Saved"})
+                res.status(200).json({message : "Fetch and Save"})
             }
         }
         saveData(1 , 10)
